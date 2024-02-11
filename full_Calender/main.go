@@ -7,12 +7,12 @@ import (
 
 func main() {
 	var number string
-	fmt.Printf("1)changing \n chose:")
+	fmt.Printf("1)changing \n ~chose:")
 	fmt.Scanln(&number)
 	switch number {
 	case "1":
 		var number_changing string
-		fmt.Printf("1)changing to gregorian \n 2)changing to jalali \n ~chose:")
+		fmt.Printf("1)changing to gregorian \n2)changing to jalali \n ~chose:")
 		fmt.Scanln(&number_changing)
 		switch number_changing {
 		case "1":
@@ -48,7 +48,7 @@ func main() {
 			e, r, t := changing.Changed_to_jalali(year_change, month_change, day_change)
 			fmt.Println(e, r, t)
 		}
-		
+
 	}
 
 }
