@@ -4,7 +4,6 @@ import (
 	"Fuul_Calender/changing"
 	"fmt"
 	"time"
-	"math"
 )
 
 var month_gregorian = map[string]int{
@@ -62,28 +61,29 @@ func about_now() (int, string, int, string, int) {
 func time_sub(start_year, start_month, start_day, end_year, end_month, end_day int) time.Duration {
 	// add 0 befor date number in Start-Date
 	var start_Date string
-	if start_month < 10 {
-		start_Date = fmt.Sprintf("%d-0%d-%d", start_year, start_day, start_day)
+	if start_month < 10 && start_day < 10 {
+		start_Date = fmt.Sprintf("%d-0%d-0%d", start_year, start_month, start_day)
+	} else if start_month < 10 {
+		start_Date = fmt.Sprintf("%d-0%d-%d", start_year, start_month, start_day)
 	} else if start_day < 10 {
-		start_Date = fmt.Sprintf("%d-%d-0%d", start_year, start_day, start_day)
-	} else if start_month < 10 && start_day < 10 {
-		start_Date = fmt.Sprintf("%d-0%d-0%d", start_year, start_day, start_day)
+		start_Date = fmt.Sprintf("%d-%d-0%d", start_year, start_month, start_day)
 	} else {
-		start_Date = fmt.Sprintf("%d-%d-%d", start_year, start_day, start_day)
+		start_Date = fmt.Sprintf("%d-%d-%d", start_year, start_month, start_day)
 	}
-
+	fmt.Println(start_Date)
 	// add 0 befor date number in End-Date
 	var end_date string
-	if end_month < 10 && end_day < 10  {
+	if end_month < 10 && end_day < 10 {
 		end_date = fmt.Sprintf("%d-0%d-0%d", end_year, end_month, end_day)
 	} else if end_day < 10 {
 		end_date = fmt.Sprintf("%d-%d-0%d", end_year, end_month, end_day)
-	} else if end_month < 10  {
+	} else if end_month < 10 {
 		end_date = fmt.Sprintf("%d-0%d-%d", end_year, end_month, end_day)
-		
+
 	} else {
 		end_date = fmt.Sprintf("%d-%d-%d", end_year, end_month, end_day)
 	}
+	fmt.Println(end_date)
 
 	layout := "2006-01-02"
 	date1, _ := time.Parse(layout, start_Date)
@@ -92,18 +92,18 @@ func time_sub(start_year, start_month, start_day, end_year, end_month, end_day i
 	return duration
 }
 
+func info_age(duration time.Duration) (hour, year_age, month_age, m int) {
+	h := duration.Hours()
+	var hours int = int(h)
+	year := hours / 8760
 
-func info_age (duration time.Duration)(hour , year_age ,month_age float64){
-	day := math.Floor(duration.Hours()/24)
-	fmt.Println( duration , duration.Abs(),day)
-	year := day/(30*12)
-	fmt.Println(year)
-	mm := year * 12
-	m := day / 30
-	month := math.Abs(m - mm)
-	fmt.Println(month)
+	nmonth := hours / 730
+	month := nmonth - (year * 12)
 
-    return duration.Hours(), math.Floor(year) , math.Floor(month)
+	nday := hours / 24
+	day := nday - ((year * 365) + (month * 30) + month)
+
+	return hours, year, month, day
 }
 
 func main() {
@@ -186,6 +186,8 @@ func main() {
 			yn, mn, dn, _, _ := about_now()
 			de := time_sub(brith_year, birth_month, birth_day, yn, month_gregorian[mn], dn)
 			fmt.Println(de)
+			hi, yi, mi, di := info_age(de)
+			fmt.Printf("You have already lived %d Years, %d Months and %d Days and a total of %d hours. ", yi, mi, di, hi)
 
 		case "2":
 			var brith_year int
@@ -205,7 +207,8 @@ func main() {
 			yng, mng, dng := changing.Changed_to_jalali(yn, month_gregorian[mn], dn)
 
 			de := time_sub(brith_year, birth_month, birth_day, yng, mng, dng)
-			fmt.Println(de, de.Hours())
+			hi, yi, mi, di := info_age(de)
+			fmt.Printf("You have already lived %d Years, %d Months and %d Days and a total of %d hours. ", yi, mi, di, hi)
 
 		}
 
@@ -236,9 +239,9 @@ func main() {
 			fmt.Printf("write day of Person 2: ")
 			fmt.Scanln(&birth_day_P2)
 
-			de := time_sub(brith_year_P1,birth_month_P1 , birth_day_P1 , brith_year_P2 , birth_month_P1  , birth_day_P2)
-			hour , month , year := info_age(de)
-			fmt.Println( de ,hour , month , year)
+			de := time_sub(brith_year_P1, birth_month_P1, birth_day_P1, brith_year_P2, birth_month_P1, birth_day_P2)
+			hi, yi, mi, di := info_age(de)
+			fmt.Printf("You currently have a difference of %d Years, %d Months and %d Days and a total of %d hours. ", yi, mi, di, hi)
 
 		case "2":
 			var brith_year_P1 int
@@ -261,10 +264,11 @@ func main() {
 			fmt.Printf("write day of Person 2: ")
 			fmt.Scanln(&birth_day_P2)
 
-			ybp1 , mbp1 , dbp1 := changing.Changed_to_gregorian(brith_year_P1, birth_month_P1, birth_day_P1)
-			ybp2 , mbp2 , dbp2 := changing.Changed_to_gregorian(brith_year_P2, birth_month_P2, birth_day_P2)
-			de := time_sub(ybp1 , mbp1 , dbp1, ybp2 , mbp2 , dbp2)
-			fmt.Println(de)
+			ybp1, mbp1, dbp1 := changing.Changed_to_gregorian(brith_year_P1, birth_month_P1, birth_day_P1)
+			ybp2, mbp2, dbp2 := changing.Changed_to_gregorian(brith_year_P2, birth_month_P2, birth_day_P2)
+			de := time_sub(ybp1, mbp1, dbp1, ybp2, mbp2, dbp2)
+			hi, yi, mi, di := info_age(de)
+			fmt.Printf("You currently have a difference of %d Years, %d Months and %d Days and a total of %d hours. ", yi, mi, di, hi)
 
 		}
 
